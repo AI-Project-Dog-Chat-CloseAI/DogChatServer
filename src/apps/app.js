@@ -51,14 +51,8 @@ io.on('connection', (socket) => {
         }
     })
 
-    // socket.on('message', (data) => {
-    //     setTimeout(() => {
-    //         socket.emit('message', { status: true, message: "天気がいいから、散歩しましょう！！！！" });
-    //     }, 5000);
-    // })
-
-    socket.on('message', (data) => {
-        socket.emit('message', { status: true, message: chat(data.message) });
+    socket.on('message', async (data) => {
+        socket.emit('message', { status: true, message: await chat(data.message) });
     })
 
     socket.on('active', (data) => {
