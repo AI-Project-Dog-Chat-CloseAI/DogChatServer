@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 from googlesearch import search
 import operator
 from flask import Flask, request, jsonify
-from tqdm import tqdm
 import json
 from sentence_transformers import SentenceTransformer, util
 model = SentenceTransformer('all-MiniLM-L6-v2' )
@@ -115,64 +114,63 @@ def main():
 
     result = {}
 
-    with tqdm(total=len(search_result)) as pbar:
-        for url in search_result: 
-            domain = urlparse(url).netloc
-            if domain not in domain_dict.keys():
-                continue
-            domain = domain_dict[domain]
-            article = Article(url)
-            article.download() 
-             #sử dụng framler để đọc dữ liệu từ các trang báo
-            try:
-                
-                article.parse()
-                text = article.text #trả về data
-            except Exception as e:
-                print(f"Error parsing {url}: {e}")
-                continue
+    for url in search_result: 
+        domain = urlparse(url).netloc
+        if domain not in domain_dict.keys():
+            continue
+        domain = domain_dict[domain]
+        article = Article(url)
+        article.download() 
+            #sử dụng framler để đọc dữ liệu từ các trang báo
+        try:
+            
+            article.parse()
+            text = article.text #trả về data
+        except Exception as e:
+            print(f"Error parsing {url}: {e}")
+            continue
 
-            passages = []
+        passages = []
 
-            for sent in text.split('.'): #tách data trả về thành các câu
-                sent_tok = tokenize(sent) #phân tích các từ có trong câu
-                sent_keywords = keywords_extraction(sent_tok)
-                num_overlap_keywords = len(set(sent_keywords) & set(keywords)) #số từ trùng với keyword có trong câu
-                if num_overlap_keywords > 1:
-                    passages.append(sent)  #trả về câu có ít nhất 2 từ trùng với keyword
-                    print(sent)
+        for sent in text.split('.'): #tách data trả về thành các câu
+            sent_tok = tokenize(sent) #phân tích các từ có trong câu
+            sent_keywords = keywords_extraction(sent_tok)
+            num_overlap_keywords = len(set(sent_keywords) & set(keywords)) #số từ trùng với keyword có trong câu
+            if num_overlap_keywords > 1:
+                passages.append(sent)  #trả về câu có ít nhất 2 từ trùng với keyword
+                print(sent)
 
-            for p in passages:
-                res = []
-                if type == 'who':
-                    for info in ner(p): #phân tích, phân loại từ thành thực thể
-                        if info[3] == 'B-PER': #từ là thực thể chỉ tên thì nhận
-                            res.append(info[0])
-                        if info[3] == 'I-PER':
-                            res[-1] += ' ' + info[0]
-                elif type == 'where':
-                    for info in ner(p): #phân tích, phân loại từ thành thực thể
-                        if info[3] == 'B-LOC': #từ là thực thể chỉ tên thì nhận
-                            res.append(info[0])
-                elif type == 'what': 
-                    for info in ner(p): #phân tích, phân loại từ thành thực thể
-                        if info[3] == 'O': #từ là thực thể chỉ tên thì nhận
-                            res.append(info[0])
-                elif type == 'number': 
-                    for info in ner(p): #phân tích, phân loại từ thành thực thể
-                        if info[1] == 'M': #từ là thực thể chỉ tên thì nhậsn
-                            res.append(info[0])
-                for r in res: #đếm số lần xuất hiện của từ
-                    if r in result.keys(): 
-                        result[r] += 1
-                    else:
-                        result[r] = 1
-            for key in result.keys():
-                if "_".join(key.split()).lower() in keywords: #từ có trong câu hỏi thì loại
-                    result[key] = 0
-                if key in string.punctuation: 
-                    result[key] = 0
-            pbar.update(1)
+        for p in passages:
+            res = []
+            if type == 'who':
+                for info in ner(p): #phân tích, phân loại từ thành thực thể
+                    if info[3] == 'B-PER': #từ là thực thể chỉ tên thì nhận
+                        res.append(info[0])
+                    if info[3] == 'I-PER':
+                        res[-1] += ' ' + info[0]
+            elif type == 'where':
+                for info in ner(p): #phân tích, phân loại từ thành thực thể
+                    if info[3] == 'B-LOC': #từ là thực thể chỉ tên thì nhận
+                        res.append(info[0])
+            elif type == 'what': 
+                for info in ner(p): #phân tích, phân loại từ thành thực thể
+                    if info[3] == 'O': #từ là thực thể chỉ tên thì nhận
+                        res.append(info[0])
+            elif type == 'number': 
+                for info in ner(p): #phân tích, phân loại từ thành thực thể
+                    if info[1] == 'M': #từ là thực thể chỉ tên thì nhậsn
+                        res.append(info[0])
+            for r in res: #đếm số lần xuất hiện của từ
+                if r in result.keys(): 
+                    result[r] += 1
+                else:
+                    result[r] = 1
+        for key in result.keys():
+            if "_".join(key.split()).lower() in keywords: #từ có trong câu hỏi thì loại
+                result[key] = 0
+            if key in string.punctuation: 
+                result[key] = 0
+
     print(result)
     sorted_result = sorted(result.items(), key=operator.itemgetter(1), reverse=True)
     if(sorted_result[0][0] == "") : return jsonify(), 404
