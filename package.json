@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/socket.io": "^3.0.2",
+    "axios": "^1.7.2",
     "config": "^3.3.11",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.9",
@@ -18,7 +19,6 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.12",
     "nodemon": "^3.1.0",
-    "python-shell": "^5.0.0",
     "socket.io": "^4.7.4"
   }
 }

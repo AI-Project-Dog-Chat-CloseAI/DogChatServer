@@ -1,19 +1,13 @@
-module.exports = async (message) => {
-    var spawn = require('child_process').spawn;
-    var result;
-    var process = spawn('python', [
-        `./dogchat.py`,
-        message
-    ]);
-    await process.stdout.on('data', function(data) {
-        result +=data.toString();
-        console.log(data.toString());
-    });
+const axios = require('axios');
 
-    await process.on('close', function(code) {
-        console.log(result);
-    });
-    
-    return result;
+module.exports = async (message) => {
+    try {
+        const response = await axios.post('http://127.0.0.1:5000', {
+            question : message
+        });
+        return response.data;
+    } catch (err) {
+        return "Xin lỗi tôi không thể trả lời câu hỏi này của bạn"
+    }
 }
 
