@@ -24,7 +24,7 @@ và sử dụng python để cài các thư viện python cần thiết bao gồ
 
 Truy cập trang web của `[Node](https://nodejs.org/en)` để tại node enviroment có thể chạy ứng dụng
 
-Thay đổi biến eviroment trong máy tính của bạn
+Thay đổi biến enviroment trong máy tính của bạn
 
 Sau khi thêm vào sử dụng cmd `npm -v` hoặc `node -v` để kiểm tra phiên bản node của bạn để chắc chắn đã có module
 
