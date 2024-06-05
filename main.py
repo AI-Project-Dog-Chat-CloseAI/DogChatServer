@@ -98,7 +98,7 @@ def main():
     type = ques_type(keywords)
     print(type)
 
-    search_result = list(search(question, num=10 ,lang = "vi", country='VN'))
+    search_result = list(search(question, num= 5 ,lang = "vi", country='VN'))
     print(search_result)
 
     domain_dict = {
