@@ -59,7 +59,7 @@ def load_dialogs(file_path):
     return data
 
 # Hàm tìm kiếm câu tương tự nhất
-def get_most_similar_response(user_input, dialogs, similarity_threshold=0.9, batch_size=10):
+def get_most_similar_response(user_input, dialogs, similarity_threshold=0.8, batch_size=10):
     questions = [dialog['question'] for dialog in dialogs]
     answers = [dialog['answers'] for dialog in dialogs]
     
