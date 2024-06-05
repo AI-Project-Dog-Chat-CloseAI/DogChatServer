@@ -155,7 +155,7 @@ def main():
                         res.append(info[0])
             elif type == 'what': 
                 for info in ner(p): # Phân tích, phân loại từ thành thực thể
-                    if info[3] == 'O': # Từ là thực thể chỉ tên thì nhận
+                    if info[3] == 'O' and info[1] == 'N': # Từ là thực thể chỉ tên thì nhận
                         res.append(info[0])
             elif type == 'number': 
                 for info in ner(p): # Phân tích, phân loại từ thành thực thể
